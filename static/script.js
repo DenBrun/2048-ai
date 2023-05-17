@@ -5,4 +5,8 @@ const gameBoardElem = document.getElementById("game-board")
 
 const gameBoard = new GameBoard(gameBoardElem)
 
-const newTile = new Tile(gameBoardElem)
+// console.log(gameBoard.emptyCells);
+gameBoard.addRandomTile()
+gameBoard.addRandomTile()
+
+// const newTile = new Tile(gameBoardElem)

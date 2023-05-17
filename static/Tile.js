@@ -11,4 +11,14 @@ export default class Tile {
         gameBoard.append(this.#tileElement)
         this.#value = value
     }
+
+    set x(value) {
+        this.#x = value
+        this.#tileElement.style.setProperty("--x", value)
+    }
+
+    set y(value) {
+        this.#y = value
+        this.#tileElement.style.setProperty("--y", value)
+    }
 }
