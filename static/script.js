@@ -1,37 +1,59 @@
 import GameBoard from "./GameBoard.js"
-import Tile from "./Tile.js"
 
 const gameBoardElem = document.getElementById("game-board")
 
 const gameBoard = new GameBoard(gameBoardElem)
 
-// console.log(gameBoard.emptyCells);
 gameBoard.addRandomTile()
 gameBoard.addRandomTile()
+resetListener()
 
-console.log(gameBoard.cellsByColumn);
-// const newTile = new Tile(gameBoardElem)
 
-window.addEventListener("keydown", handleMove)
+function resetListener() {
+    window.addEventListener("keydown", handleMove, { once: true })
+}
+
 
 function handleMove(e) {
     switch (e.key) {
         case "ArrowUp":
+            if (!canMoveUp()) {
+                resetListener()
+                return
+            }
             moveUp();
             break;
         case "ArrowDown":
+            if (!canMoveDown()) {
+                resetListener()
+                return
+            }
             moveDown();
             break;
         case "ArrowLeft":
+            if (!canMoveLeft()) {
+                resetListener()
+                return
+            }
             moveLeft();
             break;
         case "ArrowRight":
+            if (!canMoveRight()) {
+                resetListener()
+                return
+            }
             moveRight();
             break;
         default:
+            resetListener()
             return;
     }
     gameBoard.addRandomTile()
+    if (!canMoveUp() && !canMoveDown() && !canMoveLeft() && !canMoveRight()) {
+        alert("Game over")
+        return
+    }
+    resetListener()
 }
 
 
@@ -70,14 +92,36 @@ function moveTiles(cells) {
                     destinationCell.tile = cell.tile
                 }
                 cell.tile = null
-                console.log(cell);
             }
 
         }
     })
 }
 
+function canMoveUp() {
+    return canMove(gameBoard.cellsByColumn)
+}
+
+function canMoveDown() {
+    return canMove(gameBoard.cellsByColumn.map(column => [...column].reverse()))
+}
+
+function canMoveLeft() {
+    return canMove(gameBoard.cellsByRow)
+}
+
+function canMoveRight() {
+    return canMove(gameBoard.cellsByRow.map(row => [...row].reverse()))
+}
+
 
 function canMove(cells) {
-
+    return cells.some(cellGroup => {
+        return cellGroup.some((cell, i) => {
+            if (i === 0) return false
+            if (!cell.tile) return false
+            const cellAbove = cellGroup[i - 1]
+            return cellAbove.canAccept(cell.tile)
+        })
+    })
 }
