@@ -29,13 +29,26 @@ function handleMove(e) {
             moveRight();
             break;
         default:
-            break;
+            return;
     }
+    gameBoard.addRandomTile()
 }
 
 
 function moveUp() {
     moveTiles(gameBoard.cellsByColumn)
+}
+
+function moveDown() {
+    moveTiles(gameBoard.cellsByColumn.map(column => [...column].reverse()))
+}
+
+function moveLeft() {
+    moveTiles(gameBoard.cellsByRow)
+}
+
+function moveRight() {
+    moveTiles(gameBoard.cellsByRow.map(row => [...row].reverse()))
 }
 
 
@@ -44,17 +57,17 @@ function moveTiles(cells) {
         for (let i = 1; i < cellGroup.length; i++) {
             const cell = cellGroup[i];
             if (!cell.tile) continue
-            let newCell
+            let destinationCell
             for (let j = i - 1; j >= 0; j--) {
                 const cellAbove = cellGroup[j]
                 if (!cellAbove.canAccept(cell.tile)) break
-                newCell = cellAbove
+                destinationCell = cellAbove
             }
-            if (newCell) {
-                if (newCell.tile) {
-                    newCell.mergeTile(cell.tile)
+            if (destinationCell) {
+                if (destinationCell.tile) {
+                    destinationCell.mergeTile(cell.tile)
                 } else {
-                    newCell.tile = cell.tile
+                    destinationCell.tile = cell.tile
                 }
                 cell.tile = null
                 console.log(cell);
@@ -64,9 +77,6 @@ function moveTiles(cells) {
     })
 }
 
-function moveLeft() {
-    console.log(gameBoard.cellsByRow);
-}
 
 function canMove(cells) {
 
