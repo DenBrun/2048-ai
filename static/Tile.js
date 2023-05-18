@@ -29,4 +29,18 @@ export default class Tile {
     get y() {
         return this.#y
     }
+
+    get value() {
+        return this.#value
+    }
+
+    set value(value) {
+        this.#tileElement.classList.replace(`tile-${this.#value}`, `tile-${value}`)
+        this.#value = value
+        this.#tileElement.innerHTML = value
+    }
+
+    remove() {
+        this.#tileElement.remove()
+    }
 }
