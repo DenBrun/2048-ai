@@ -29,4 +29,24 @@ export default class GameBoard {
     addRandomTile() {
         this.randomEmptyCell().tile = new Tile(this.#grid_element)
     }
+
+    get cells() {
+        return this.#cells
+    }
+
+    get cellsByColumn() {
+        const byColumn = [[], [], [], []]
+        for (const cell of this.#cells) {
+            byColumn[cell.x][cell.y] = cell
+        }
+        return byColumn
+    }
+
+    get cellsByRow() {
+        const byRow = [[], [], [], []]
+        for (const cell of this.#cells) {
+            byRow[cell.y][cell.x] = cell
+        }
+        return byRow
+    }
 }

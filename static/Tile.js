@@ -21,4 +21,12 @@ export default class Tile {
         this.#y = value
         this.#tileElement.style.setProperty("--y", value)
     }
+
+    get x() {
+        return this.#x
+    }
+
+    get y() {
+        return this.#y
+    }
 }
