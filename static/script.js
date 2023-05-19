@@ -4,6 +4,14 @@ const gameBoardElem = document.getElementById("game-board")
 
 const gameBoard = new GameBoard(gameBoardElem)
 
+// gameBoard.addTile(2, 0, 0)
+// gameBoard.addTile(2, 1, 0)
+// gameBoard.addTile(2, 2, 0)
+// gameBoard.addTile(2, 3, 0)
+// gameBoard.addTile(2, 0, 1)
+// gameBoard.addTile(4, 1, 1)
+// gameBoard.addTile(2, 2, 1)
+// gameBoard.addTile(2, 3, 1)
 gameBoard.addRandomTile()
 gameBoard.addRandomTile()
 resetListener()
@@ -14,40 +22,41 @@ function resetListener() {
 }
 
 
-function handleMove(e) {
+async function handleMove(e) {
     switch (e.key) {
         case "ArrowUp":
             if (!canMoveUp()) {
                 resetListener()
                 return
             }
-            moveUp();
-            break;
+            await moveUp()
+            break
         case "ArrowDown":
             if (!canMoveDown()) {
                 resetListener()
                 return
             }
-            moveDown();
-            break;
+            await moveDown()
+            break
         case "ArrowLeft":
             if (!canMoveLeft()) {
                 resetListener()
                 return
             }
-            moveLeft();
-            break;
+            await moveLeft()
+            break
         case "ArrowRight":
             if (!canMoveRight()) {
                 resetListener()
                 return
             }
-            moveRight();
-            break;
+            await moveRight()
+            break
         default:
             resetListener()
-            return;
+            return
     }
+    gameBoard.cells.forEach(cell => cell.mergeTiles())
     gameBoard.addRandomTile()
     if (!canMoveUp() && !canMoveDown() && !canMoveLeft() && !canMoveRight()) {
         alert("Game over")
@@ -58,44 +67,49 @@ function handleMove(e) {
 
 
 function moveUp() {
-    moveTiles(gameBoard.cellsByColumn)
+    return moveTiles(gameBoard.cellsByColumn)
 }
 
 function moveDown() {
-    moveTiles(gameBoard.cellsByColumn.map(column => [...column].reverse()))
+    return moveTiles(gameBoard.cellsByColumn.map(column => [...column].reverse()))
 }
 
 function moveLeft() {
-    moveTiles(gameBoard.cellsByRow)
+    return moveTiles(gameBoard.cellsByRow)
 }
 
 function moveRight() {
-    moveTiles(gameBoard.cellsByRow.map(row => [...row].reverse()))
+    return moveTiles(gameBoard.cellsByRow.map(row => [...row].reverse()))
 }
 
 
 function moveTiles(cells) {
-    cells.forEach(cellGroup => {
-        for (let i = 1; i < cellGroup.length; i++) {
-            const cell = cellGroup[i];
-            if (!cell.tile) continue
-            let destinationCell
-            for (let j = i - 1; j >= 0; j--) {
-                const cellAbove = cellGroup[j]
-                if (!cellAbove.canAccept(cell.tile)) break
-                destinationCell = cellAbove
-            }
-            if (destinationCell) {
-                if (destinationCell.tile) {
-                    destinationCell.mergeTile(cell.tile)
-                } else {
-                    destinationCell.tile = cell.tile
+    return Promise.all(
+        cells.flatMap(cellGroup => {
+            const promises = []
+            for (let i = 1; i < cellGroup.length; i++) {
+                const cell = cellGroup[i];
+                if (!cell.tile) continue
+                let destinationCell
+                for (let j = i - 1; j >= 0; j--) {
+                    const cellAbove = cellGroup[j]
+                    if (!cellAbove.canAccept(cell.tile)) break
+                    destinationCell = cellAbove
                 }
-                cell.tile = null
-            }
+                if (destinationCell) {
 
-        }
-    })
+                    promises.push(cell.tile.waitForTransition())
+                    if (destinationCell.tile) {
+                        destinationCell.tileToMerge = cell.tile
+                    } else {
+                        destinationCell.tile = cell.tile
+                    }
+                    cell.tile = null
+                }
+            }
+            return promises
+        })
+    )
 }
 
 function canMoveUp() {

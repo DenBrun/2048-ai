@@ -213,6 +213,22 @@ body {
     }
 }
 
+.tile-merge {
+    animation: merge-animation 200ms ease-in-out;
+}
+
+@keyframes merge-animation {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.2);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
 .tile.tile-2 {
     background: #eee4da;
     box-shadow: 0 0 30px 10px rgba(243, 215, 116, 0), inset 0 0 0 1px rgba(255, 255, 255, 0);

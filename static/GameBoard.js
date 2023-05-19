@@ -26,6 +26,10 @@ export default class GameBoard {
         return emptyCells[randomIndex]
     }
 
+    addTile(value, x, y) {
+        this.#cells.find(cell => cell.x == x & cell.y == y).tile = new Tile(this.#grid_element, value)
+    }
+
     addRandomTile() {
         this.randomEmptyCell().tile = new Tile(this.#grid_element)
     }

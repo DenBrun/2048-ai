@@ -43,4 +43,23 @@ export default class Tile {
     remove() {
         this.#tileElement.remove()
     }
+
+
+    animateMerge() {
+        this.#tileElement.classList.remove('tile-merge')
+        this.#tileElement.classList.add('tile-merge')
+        return this.waitForTransition(true)
+    }
+
+    waitForTransition(animation = false) {
+        return new Promise(resolve => {
+            this.#tileElement.addEventListener(
+                animation ? "animationend" : "transitionend",
+                resolve,
+                {
+                    once: true,
+                }
+            )
+        })
+    }
 }
