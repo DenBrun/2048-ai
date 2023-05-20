@@ -202,8 +202,11 @@ body {
     top: calc(var(--y) * (var(--cell-size) + var(--cell-gap)) + var(--cell-gap));
     left: calc(var(--x) * (var(--cell-size) + var(--cell-gap)) + var(--cell-gap));
 
-    animation: show 200ms ease-in-out;
     transition: 100ms ease-in-out;
+}
+
+.tile-show {
+    animation: show 200ms ease-in-out;
 }
 
 @keyframes show {

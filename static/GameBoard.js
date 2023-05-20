@@ -31,7 +31,7 @@ export default class GameBoard {
     }
 
     addRandomTile() {
-        this.randomEmptyCell().tile = new Tile(this.#grid_element)
+        return this.randomEmptyCell().tile = new Tile(this.#grid_element)
     }
 
     get cells() {
