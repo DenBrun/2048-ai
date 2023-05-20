@@ -56,7 +56,7 @@ async function handleMove(e) {
             resetListener()
             return
     }
-    gameBoard.cells.forEach(cell => cell.mergeTiles())
+    gameBoard.mergeTiles()
     const newTile = gameBoard.addRandomTile()
     if (!canMoveUp() && !canMoveDown() && !canMoveLeft() && !canMoveRight()) {
         newTile.waitForTransition(true).then(_ => alert("Game over"))

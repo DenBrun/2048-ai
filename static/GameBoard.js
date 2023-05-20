@@ -4,6 +4,7 @@ import Tile from "./Tile.js"
 export default class GameBoard {
     #grid_element
     #cells
+    #score = 0
     constructor(grid_element) {
         this.#grid_element = grid_element
         this.#cells = this.#create_cells()
@@ -52,5 +53,17 @@ export default class GameBoard {
             byRow[cell.y][cell.x] = cell
         }
         return byRow
+    }
+
+    mergeTiles() {
+        const score_incr = this.#cells.reduce((sum, cell) => sum += cell.mergeTiles(), 0)
+        if (score_incr) {
+            this.#score += score_incr
+            this.#updateScore()
+        }
+    }
+
+    #updateScore() {
+        document.getElementById('score').innerHTML = this.#score
     }
 }

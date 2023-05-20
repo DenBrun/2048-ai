@@ -38,11 +38,12 @@ export default class Cell {
     }
 
     mergeTiles() {
-        if (this.tile == null || !this.#tileToMerge) return
-        this.tile.value *= 2
-        this.tile.animateMerge()
+        if (this.#tile == null || !this.#tileToMerge) return 0
+        this.#tile.value *= 2
+        this.#tile.animateMerge()
         this.#tileToMerge.remove()
         this.#tileToMerge = null
+        return this.#tile.value
     }
 
     canAccept(tile) {
