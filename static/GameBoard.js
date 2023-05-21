@@ -59,11 +59,16 @@ export default class GameBoard {
         const score_incr = this.#cells.reduce((sum, cell) => sum += cell.mergeTiles(), 0)
         if (score_incr) {
             this.#score += score_incr
-            this.#updateScore()
+            this.#updateScore(score_incr)
         }
     }
 
-    #updateScore() {
+    #updateScore(difference) {
+        let diffElem = document.createElement("div");
+        diffElem.classList.add("score-addition");
+        diffElem.textContent = "+" + difference;
+
         document.getElementById('score').innerHTML = this.#score
+        document.getElementById('score').appendChild(diffElem);
     }
 }
