@@ -5,6 +5,7 @@ export default class GameBoard {
     #grid_element
     #cells
     #score = 0
+    #bestscore = 0
     constructor(grid_element) {
         this.#grid_element = grid_element
         this.#cells = this.#create_cells()
@@ -70,5 +71,10 @@ export default class GameBoard {
 
         document.getElementById('score').innerHTML = this.#score
         document.getElementById('score').appendChild(diffElem);
+
+        if (this.#score > this.#bestscore) {
+            this.#bestscore = this.#score
+            document.getElementById('bestscore').innerHTML = this.#bestscore
+        }
     }
 }
