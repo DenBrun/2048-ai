@@ -18,34 +18,35 @@ resetListener()
 
 
 function resetListener() {
-    window.addEventListener("keydown", handleMove, { once: true })
+    const directions = { ArrowUp: "up", ArrowDown: "down", ArrowLeft: "left", ArrowRight: "right" }
+    window.addEventListener("keydown", (e) => handleMove(directions[e.key]), { once: true })
+    gameBoardElem.addEventListener('swiped', (e) => handleMove(e.detail.dir), { once: true });
 }
 
-
-async function handleMove(e) {
-    switch (e.key) {
-        case "ArrowUp":
+async function handleMove(direction) {
+    switch (direction) {
+        case "up":
             if (!canMoveUp()) {
                 resetListener()
                 return
             }
             await moveUp()
             break
-        case "ArrowDown":
+        case "down":
             if (!canMoveDown()) {
                 resetListener()
                 return
             }
             await moveDown()
             break
-        case "ArrowLeft":
+        case "left":
             if (!canMoveLeft()) {
                 resetListener()
                 return
             }
             await moveLeft()
             break
-        case "ArrowRight":
+        case "right":
             if (!canMoveRight()) {
                 resetListener()
                 return
