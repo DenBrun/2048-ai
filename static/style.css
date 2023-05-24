@@ -108,8 +108,17 @@ body {
 .heading {
     display: flex;
     justify-content: space-between;
-    /* height: 100%; */
-    margin-bottom: 20px;
+    margin-bottom: 40px;
+    padding: 10px;
+}
+
+@media (max-width: 520px) {
+    .heading {
+        padding-top: 15px;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+    }
 }
 
 .title {
@@ -182,8 +191,9 @@ body {
 }
 
 #game-board {
+    --cell-size: 106.25px;
+    --cell-gap: 15px;
     position: relative;
-    margin-top: 25px;
     background: #bbada0;
     border-radius: 6px;
     padding: 15px;
@@ -196,9 +206,11 @@ body {
     user-select: none;
     touch-action: none;
     display: grid;
-    gap: 15px;
-    grid-template-columns: repeat(4, 106.25px);
-    grid-template-rows: repeat(4, 106.25px);
+    gap: var(--cell-gap);
+    grid-template-columns: repeat(4, var(--cell-size));
+    grid-template-rows: repeat(4, var(--cell-size));
+    max-width: fit-content;
+    margin: 0 auto;
 }
 
 .grid-cell {
@@ -209,8 +221,6 @@ body {
 .tile {
     --cell-size: 106.25px;
     --cell-gap: 15px;
-    /* --x: 1;
-    --y: 2; */
     position: absolute;
     display: flex;
     justify-content: center;
@@ -227,6 +237,18 @@ body {
     left: calc(var(--x) * (var(--cell-size) + var(--cell-gap)) + var(--cell-gap));
 
     transition: 100ms ease-in-out;
+}
+
+@media (max-width: 520px) {
+    .tile,
+    #game-board {
+        --cell-size: 60px;
+        --cell-gap: 10px;
+        padding: 10px;
+    }
+    .tile {
+        font-size: 35px;
+    }
 }
 
 .tile-show {
