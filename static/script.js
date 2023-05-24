@@ -1,21 +1,62 @@
 import GameBoard from "./GameBoard.js"
-
 const gameBoardElem = document.getElementById("game-board")
-
 const gameBoard = new GameBoard(gameBoardElem)
 
-// gameBoard.addTile(2, 0, 0)
-// gameBoard.addTile(2, 1, 0)
-// gameBoard.addTile(2, 2, 0)
-// gameBoard.addTile(2, 3, 0)
-// gameBoard.addTile(2, 0, 1)
-// gameBoard.addTile(4, 1, 1)
-// gameBoard.addTile(2, 2, 1)
-// gameBoard.addTile(2, 3, 1)
-gameBoard.addRandomTile()
-gameBoard.addRandomTile()
-resetListener()
 
+main()
+
+
+async function main() {
+    window.onbeforeunload = save_user_data;
+    let data = await get_user_data()
+    console.log(data);
+    gameBoard.addRandomTile()
+    gameBoard.addRandomTile()
+    resetListener()
+}
+
+
+async function get_user_data() {
+    let user_id = localStorage.getItem('id')
+    if (user_id == null) {
+        user_id = crypto.randomUUID()
+        localStorage.setItem('id', user_id)
+        return
+    }
+
+    const params = new URLSearchParams({
+        id: user_id
+    });
+
+    const url = new URL('/get-user', window.location.href);
+    url.search = params;
+
+    try {
+        const response = await fetch(url);
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        throw new Error('Error fetching user data: ' + error);
+    }
+}
+
+function save_user_data() {
+    const user_id = localStorage.getItem('id')
+    let data = { 'best_score': gameBoard.best_score }
+    const user = {
+        id: user_id,
+        data: data
+    }
+
+    fetch('/save-user', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(user)
+    })
+
+}
 
 function resetListener() {
     const directions = { ArrowUp: "up", ArrowDown: "down", ArrowLeft: "left", ArrowRight: "right" }

@@ -77,4 +77,7 @@ export default class GameBoard {
             document.getElementById('bestscore').innerHTML = this.#bestscore
         }
     }
+    get best_score() {
+        return this.#bestscore
+    }
 }
