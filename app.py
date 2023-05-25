@@ -24,9 +24,7 @@ def get_game_state():
 @app.route('/get-user', methods=['GET'])
 def get_user_data():
     # Retrieve the current game state
-    # Implement this function to read the game state from a file
     user_id = request.args.get('id')
-    # data = {}
     with open('data.txt', 'r') as f:
         data = json.load(f)
     # Return the game state as JSON
@@ -39,8 +37,6 @@ def get_user_data():
 @app.route('/save-user', methods=['POST'])
 def save_user_data():
     new_data = request.get_json()
-    print(new_data['id'])
-    print(new_data['data'])
     try:
         with open('data.txt', 'r') as f:
             all_data = json.load(f)
