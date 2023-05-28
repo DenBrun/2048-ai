@@ -114,4 +114,12 @@ export default class GameBoard {
         this.#bestscore = value
         document.getElementById('bestscore').innerHTML = value
     }
+
+    getMatrix() {
+        const matrix = [];
+        for (const cellRow of this.cellsByRow) {
+            matrix.push(cellRow.map(cell => cell.tile ? cell.tile.value : 0))
+        }
+        return matrix
+    }
 }

@@ -42,7 +42,7 @@ async function get_user_data() {
         const data = await response.json();
         return data;
     } catch (error) {
-        throw new Error('Error fetching user data: ' + error);
+        console.error('Error fetching user data:', error);
     }
 }
 
