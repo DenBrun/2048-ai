@@ -40,6 +40,26 @@ export default class GameBoard {
         return this.#cells
     }
 
+    getTiles() {
+        return this.#cells.reduce((arr, cell) => {
+            if (cell.tile) {
+                arr.push(cell.tile)
+                return arr
+            } else {
+                return arr
+            }
+        }, [])
+    }
+
+    deleteTiles() {
+        this.#cells.map((cell) => {
+            if (cell.tile) {
+                cell.tile.remove()
+                cell.tile = null
+            }
+        })
+    }
+
     get cellsByColumn() {
         const byColumn = [[], [], [], []]
         for (const cell of this.#cells) {
@@ -79,5 +99,19 @@ export default class GameBoard {
     }
     get best_score() {
         return this.#bestscore
+    }
+
+    get score() {
+        return this.#score
+    }
+
+    set score(value) {
+        this.#score = value
+        document.getElementById('score').innerHTML = value
+    }
+
+    set best_score(value) {
+        this.#bestscore = value
+        document.getElementById('bestscore').innerHTML = value
     }
 }

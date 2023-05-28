@@ -1,3 +1,5 @@
 *.code-workspace
 .vscode
 __pycache__
+test.py
+data.txt
