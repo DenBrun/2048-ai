@@ -3,7 +3,7 @@ class Node {
         this.state = state;
         this.parent = parent;
         this.children = [];
-        this.visits = 0;
+        this.visits = 1;
         this.score = 0;
     }
 
@@ -52,7 +52,7 @@ class Node {
     }
 }
 
-class MCTS {
+export class MCTS {
     constructor(explorationConstant, iterations) {
         this.explorationConstant = explorationConstant;
         this.iterations = iterations;
@@ -66,7 +66,8 @@ class MCTS {
             node.update(score);
         }
         const bestChild = this.bestChild(root);
-        return bestChild.state.getBestMove();
+        // CHECK THIS!!
+        return bestChild.parent.state.getBestMove();
     }
 
     treePolicy(node) {
@@ -108,20 +109,35 @@ class MCTS {
     }
 }
 
-// Example usage
-class GameState {
+export class GameState {
     numRows = 4;
     numCols = 4;
     constructor(gameMatrix, score) {
-        this.gameMatrix = gameMatrix
-        this.score = score
+        this.gameMatrix = gameMatrix.map(row => [...row]);
+        this.score = score;
+        this.exploredMoves = new Map();
     }
 
     clone() {
-        const clonedState = new GameState();
-        clonedState.gameMatrix = this.gameMatrix.map(row => [...row]);
-        clonedState.score = this.score;
+        const clonedState = new GameState(this.gameMatrix, this.score);
         return clonedState;
+    }
+
+    generateRandomTile() {
+        const emptyCells = [];
+
+        for (let row = 0; row < this.numRows; row++) {
+            for (let col = 0; col < this.numCols; col++) {
+                if (this.gameMatrix[row][col] === 0) {
+                    emptyCells.push({ row, col });
+                }
+            }
+        }
+
+        if (emptyCells.length > 0) {
+            const randomCell = emptyCells[Math.floor(Math.random() * emptyCells.length)];
+            this.gameMatrix[randomCell.row][randomCell.col] = Math.random() < 0.5 ? 2 : 4;
+        }
     }
 
     move(direction) {
@@ -145,7 +161,8 @@ class GameState {
                 throw new Error('Invalid move direction');
         }
 
-        return this.moveTiles(rowStep, colStep);
+        this.moveTiles(rowStep, colStep);
+        this.generateRandomTile();
     }
 
     moveTiles(rowStep, colStep) {
@@ -238,54 +255,60 @@ class GameState {
     }
 
     isGameOver() {
-        // Check if the game is over
+        return (
+            !this.canMove(-1, 0) &&
+            !this.canMove(1, 0) &&
+            !this.canMove(0, -1) &&
+            !this.canMove(0, -1)
+        )
     }
 
     getScore() {
-        // Return the current score
+        return this.score
     }
 
     moveIsExplored(move) {
-        // Check if a move has been explored
+        return this.exploredMoves.has(move)
     }
 
-    setMoveExplored(move) {
-        // Mark a move as explored
+    setMoveExplored(move, value = true) {
+        this.exploredMoves.set(move, value)
     }
 
     getBestMove() {
-        // Return the best move found by the MCTS algorithm
+        const possibleMoves = this.getPossibleMoves();
+
+        let bestMove = null;
+        let bestScore = -Infinity;
+
+        for (const move of possibleMoves) {
+            if (this.moveIsExplored(move)) {
+                const clonedState = this.clone();
+                clonedState.move(move);
+                const score = clonedState.getScore();
+
+                if (score > bestScore) {
+                    bestScore = score;
+                    bestMove = move;
+                }
+            }
+        }
+
+        return bestMove;
     }
 }
 
-// const explorationConstant = 1.41; // Modify the value as needed
-// const iterations = 1000; // Modify the number of iterations as needed
+// const explorationConstant = 1.41;
+// const iterations = 100;
 
 // const mcts = new MCTS(explorationConstant, iterations);
-// const initialGameState = new GameState(); // Create an initial game state
-// const bestMove = mcts.search(initialGameState);
-// console.log("Best move:", bestMove);
-
-
-// const state = new GameState([
-//     [2, 0, 64, 4],
-//     [0, 0, 4, 2],
-//     [0, 4, 8, 16],
-//     [4, 2, 4, 4]],
+// const initialGameState = new GameState([
+//     [32, 32, 8, 2],
+//     [4, 0, 0, 0],
+//     [16, 4, 0, 0],
+//     [2, 4, 0, 0]],
 //     320
 // )
 
-
-const state = new GameState([
-    [2, 2, 32, 8],
-    [8, 8, 2, 2],
-    [2, 0, 2, 4],
-    [0, 0, 0, 0]],
-    320
-)
-
-// state.move('left')
-console.log(state.canMove(-1, 0));
-console.log(state.canMove(1, 0));
-console.log(state.canMove(0, -1));
-console.log(state.canMove(0, 1));
+// const bestMove = mcts.search(initialGameState);
+// console.log("Best move:", bestMove);

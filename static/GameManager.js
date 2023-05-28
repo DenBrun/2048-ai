@@ -1,9 +1,9 @@
+import { MCTS, GameState } from "./MCTS.js";
 export default class GameManager {
     #gameBoardElem
     #gameBoard
 
     constructor(gameBoardElem, gameBoard, currTiles, score, bestScore) {
-        console.log(score, bestScore);
         this.#gameBoardElem = gameBoardElem
         this.#gameBoard = gameBoard
         if (currTiles.length) {
@@ -67,6 +67,15 @@ export default class GameManager {
             })
             return
         }
+
+        const explorationConstant = 1.41;
+        const iterations = 100;
+
+        const mcts = new MCTS(explorationConstant, iterations);
+        console.log(this.#gameBoard.getMatrix());
+        const initialGameState = new GameState(this.#gameBoard.getMatrix(), this.#gameBoard.score)
+        const bestMove = mcts.search(initialGameState);
+        console.log("Best move:", bestMove);
         this.resetListener()
     }
 
