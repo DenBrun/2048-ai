@@ -207,11 +207,34 @@ class GameState {
         return row >= 0 && row < this.numRows && col >= 0 && col < this.numCols;
     }
 
-
-
-
     getPossibleMoves() {
-        // Return a list of possible moves
+        const possibleMoves = [];
+        if (this.canMove(-1, 0)) {
+            possibleMoves.push('up');
+        }
+        if (this.canMove(1, 0)) {
+            possibleMoves.push('down');
+        }
+        if (this.canMove(0, -1)) {
+            possibleMoves.push('left');
+        }
+        if (this.canMove(0, 1)) {
+            possibleMoves.push('right');
+        }
+        return possibleMoves;
+    }
+
+    canMove(rowStep, colStep) {
+        return this.gameMatrix.some((row, rowIndex) =>
+            row.some((tile, colIndex) => {
+                if (tile === 0) return false;
+                if (this.isValidPosition(rowIndex + rowStep, colIndex + colStep) &&
+                    (this.gameMatrix[rowIndex + rowStep][colIndex + colStep] === 0 || this.gameMatrix[rowIndex + rowStep][colIndex + colStep] === tile)) {
+                    return true;
+                }
+
+            })
+        );
     }
 
     isGameOver() {
@@ -261,5 +284,8 @@ const state = new GameState([
     320
 )
 
-state.move('left')
-console.log(state.gameMatrix);
+// state.move('left')
+console.log(state.canMove(-1, 0));
+console.log(state.canMove(1, 0));
+console.log(state.canMove(0, -1));
+console.log(state.canMove(0, 1));
