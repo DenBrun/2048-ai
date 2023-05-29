@@ -19,6 +19,7 @@ async function main() {
         gameManager = new GameManager(gameBoardElem, gameBoard, [], 0, 0)
     }
     gameManager.resetListener()
+    // gameManager.startAi();
 }
 
 

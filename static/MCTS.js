@@ -43,8 +43,13 @@ class Node {
     }
 
     update(score) {
+        // let node = this
+        // while (node != null) {
+
         this.visits += 1;
         this.score += score;
+        // node = node.parent
+        // }
     }
 
     isFullyExpanded() {
@@ -52,7 +57,7 @@ class Node {
     }
 }
 
-export class MCTS {
+class MCTS {
     constructor(explorationConstant, iterations) {
         this.explorationConstant = explorationConstant;
         this.iterations = iterations;
@@ -109,7 +114,7 @@ export class MCTS {
     }
 }
 
-export class GameState {
+class GameState {
     numRows = 4;
     numCols = 4;
     constructor(gameMatrix, score) {
@@ -259,7 +264,7 @@ export class GameState {
             !this.canMove(-1, 0) &&
             !this.canMove(1, 0) &&
             !this.canMove(0, -1) &&
-            !this.canMove(0, -1)
+            !this.canMove(0, 1)
         )
     }
 
@@ -303,12 +308,38 @@ export class GameState {
 
 // const mcts = new MCTS(explorationConstant, iterations);
 // const initialGameState = new GameState([
-//     [32, 32, 8, 2],
-//     [4, 0, 0, 0],
-//     [16, 4, 0, 0],
-//     [2, 4, 0, 0]],
-//     320
+//     [2, 4, 32, 0],
+//     [512, 32, 8, 0],
+//     [64, 16, 4, 0],
+//     [16, 4, 2, 0]],
+//     4296
 // )
 
 // const bestMove = mcts.search(initialGameState);
 // console.log("Best move:", bestMove);
+
+
+const explorationConstant = 1.41;
+const iterations = 1000;
+
+let initialGameState = new GameState([
+    [2, 4, 0, 0],
+    [0, 0, 0, 0],
+    [0, 0, 0, 0],
+    [0, 0, 0, 0]],
+    1
+);
+
+
+while (!initialGameState.isGameOver()) {
+    const mcts = new MCTS(explorationConstant, iterations);
+    const bestMove = mcts.search(initialGameState);
+    // console.log("Best move:", bestMove);
+
+    initialGameState.move(bestMove);
+    // initialGameState.generateRandomTile();
+    initialGameState = initialGameState.clone()
+}
+console.log(initialGameState.gameMatrix);
+
+
