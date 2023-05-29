@@ -22,6 +22,51 @@ export default class GameManager {
         this.#gameBoardElem.addEventListener('swiped', (e) => this.#handleMove(e.detail.dir), { once: true });
     }
 
+    startAi() {
+        setInterval(() => {
+            const explorationConstant = 1.41;
+            const iterations = 1500;
+
+            const mcts = new MCTS(explorationConstant, iterations);
+            const initialGameState = new GameState(this.#gameBoard.getMatrix(), this.#gameBoard.score)
+            const bestMove = mcts.search(initialGameState);
+            console.log("Best move:", bestMove);
+            this.#handleAiMove(bestMove);
+        }, 500)
+
+    }
+
+
+    async #handleAiMove(direction) {
+
+        switch (direction) {
+            case "up":
+                await this.#moveUp()
+                break
+            case "down":
+                await this.#moveDown()
+                break
+            case "left":
+                await this.#moveLeft()
+                break
+            case "right":
+                await this.#moveRight()
+                break
+            default:
+                return
+        }
+        this.#gameBoard.mergeTiles()
+        const newTile = this.#gameBoard.addRandomTile()
+        if (!this.#canMoveUp() && !this.#canMoveDown() && !this.#canMoveLeft() && !this.#canMoveRight()) {
+            newTile.waitForTransition(true).then(_ => {
+                alert("Game over")
+                this.restartGame()
+                this.resetListener()
+            })
+            return
+        }
+    }
+
     async #handleMove(direction) {
 
         switch (direction) {
@@ -67,15 +112,6 @@ export default class GameManager {
             })
             return
         }
-
-        const explorationConstant = 1.41;
-        const iterations = 100;
-
-        const mcts = new MCTS(explorationConstant, iterations);
-        console.log(this.#gameBoard.getMatrix());
-        const initialGameState = new GameState(this.#gameBoard.getMatrix(), this.#gameBoard.score)
-        const bestMove = mcts.search(initialGameState);
-        console.log("Best move:", bestMove);
         this.resetListener()
     }
 
