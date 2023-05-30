@@ -5,12 +5,16 @@ main()
 
 
 async function main() {
-    const gameBoardElem = document.getElementById("game-board")
-    const gameBoard = new GameBoard(gameBoardElem)
+    const gameBoardElem = document.getElementById("game-board");
+    const gameBoard = new GameBoard(gameBoardElem);
+
+    const startAiButton = document.getElementById('startAIButton');
+    startAiButton.onclick = handleAiButton;
 
     window.onbeforeunload = () => save_user_data(gameBoard);
 
     let data = await get_user_data()
+    console.log(data);
     let gameManager
     if (data) {
         gameManager = new GameManager(gameBoardElem, gameBoard, data['tiles'], data['score'], data['best_score'])
@@ -19,6 +23,14 @@ async function main() {
         gameManager = new GameManager(gameBoardElem, gameBoard, [], 0, 0)
     }
     gameManager.resetListener()
+}
+
+function handleAiButton(ev) {
+    if (ev.target.innerHTML === 'Run AI') {
+        ev.target.innerHTML = 'Stop AI'
+    } else {
+        ev.target.innerHTML = 'Run AI'
+    }
 }
 
 
