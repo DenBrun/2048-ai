@@ -5,8 +5,11 @@ main()
 
 
 async function main() {
-    const gameBoardElem = document.getElementById("game-board")
-    const gameBoard = new GameBoard(gameBoardElem)
+    const gameBoardElem = document.getElementById("game-board");
+    const gameBoard = new GameBoard(gameBoardElem);
+
+    const startAiButton = document.getElementById('startAIButton');
+    startAiButton.onclick = handleAiButton;
 
     window.onbeforeunload = () => save_user_data(gameBoard);
 
@@ -20,6 +23,14 @@ async function main() {
     }
     gameManager.resetListener()
     // gameManager.startAi();
+}
+
+function handleAiButton(ev) {
+    if (ev.target.innerHTML === 'Run AI') {
+        ev.target.innerHTML = 'Stop AI'
+    } else {
+        ev.target.innerHTML = 'Run AI'
+    }
 }
 
 
