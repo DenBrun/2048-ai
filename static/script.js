@@ -9,7 +9,6 @@ async function main() {
     const gameBoard = new GameBoard(gameBoardElem);
 
     const startAiButton = document.getElementById('startAIButton');
-    startAiButton.onclick = handleAiButton;
 
     window.onbeforeunload = () => save_user_data(gameBoard);
 
@@ -21,15 +20,19 @@ async function main() {
     else {
         gameManager = new GameManager(gameBoardElem, gameBoard, [], 0, 0)
     }
+
+    startAiButton.onclick = (ev) => handleAiButton(ev, gameManager);
     gameManager.resetListener()
     // gameManager.startAi();
 }
 
-function handleAiButton(ev) {
+function handleAiButton(ev, gameManager) {
     if (ev.target.innerHTML === 'Run AI') {
         ev.target.innerHTML = 'Stop AI'
+        gameManager.startAi();
     } else {
         ev.target.innerHTML = 'Run AI'
+        gameManager.stopAi();
     }
 }
 

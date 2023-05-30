@@ -2,6 +2,7 @@ import { MCTS, GameState } from "./MCTS.js";
 export default class GameManager {
     #gameBoardElem
     #gameBoard
+    #runningAi
 
     constructor(gameBoardElem, gameBoard, currTiles, score, bestScore) {
         this.#gameBoardElem = gameBoardElem
@@ -23,7 +24,8 @@ export default class GameManager {
     }
 
     startAi() {
-        setInterval(() => {
+        if (this.#runningAi) return;
+        this.#runningAi = setInterval(() => {
             const explorationConstant = 1.41;
             const iterations = 1500;
 
@@ -33,7 +35,11 @@ export default class GameManager {
             console.log("Best move:", bestMove);
             this.#handleAiMove(bestMove);
         }, 500)
+    }
 
+    stopAi() {
+        clearInterval(this.#runningAi);
+        this.#runningAi = null;
     }
 
 
@@ -68,7 +74,10 @@ export default class GameManager {
     }
 
     async #handleMove(direction) {
-
+        if (this.#runningAi) {
+            this.resetListener();
+            return;
+        }
         switch (direction) {
             case "up":
                 if (!this.#canMoveUp()) {
