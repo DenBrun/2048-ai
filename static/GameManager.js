@@ -26,15 +26,15 @@ export default class GameManager {
     startAi() {
         if (this.#runningAi) return;
         this.#runningAi = setInterval(() => {
-            const explorationConstant = 1.41;
-            const iterations = 1500;
+            const explorationConstant = 2000;
+            const iterations = 2000;
 
             const mcts = new MCTS(explorationConstant, iterations);
             const initialGameState = new GameState(this.#gameBoard.getMatrix(), this.#gameBoard.score)
             const bestMove = mcts.search(initialGameState);
             console.log("Best move:", bestMove);
             this.#handleAiMove(bestMove);
-        }, 500)
+        }, 400)
     }
 
     stopAi() {
