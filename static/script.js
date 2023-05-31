@@ -1,5 +1,6 @@
 import GameBoard from "./GameBoard.js"
 import GameManager from "./GameManager.js"
+import { v4 as uuidv4 } from 'https://jspm.dev/uuid';
 
 main()
 
@@ -40,7 +41,7 @@ function handleAiButton(ev, gameManager) {
 async function get_user_data() {
     let user_id = localStorage.getItem('id')
     if (user_id == null) {
-        user_id = crypto.randomUUID()
+        user_id = uuidv4()
         localStorage.setItem('id', user_id)
         return null
     }
