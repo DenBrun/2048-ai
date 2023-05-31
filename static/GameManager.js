@@ -25,21 +25,33 @@ export default class GameManager {
 
     startAi() {
         if (this.#runningAi) return;
-        this.#runningAi = setInterval(() => {
-            const explorationConstant = 2000;
-            const iterations = 2000;
+        this.#runningAi = true;
 
-            const mcts = new MCTS(explorationConstant, iterations);
-            const initialGameState = new GameState(this.#gameBoard.getMatrix(), this.#gameBoard.score)
+        const explorationConstant = 2000;
+        const iterations = 2000;
+        const mcts = new MCTS(explorationConstant, iterations);
+
+
+        const runIteration = async () => {
+            if (!this.#canMoveUp() && !this.#canMoveDown() && !this.#canMoveLeft() && !this.#canMoveRight()) {
+                this.stopAi();
+                return;
+            }
+            const initialGameState = new GameState(this.#gameBoard.getMatrix(), this.#gameBoard.score);
             const bestMove = mcts.search(initialGameState);
             console.log("Best move:", bestMove);
-            this.#handleAiMove(bestMove);
-        }, 400)
+            await this.#handleAiMove(bestMove);
+
+            if (this.#runningAi) {
+                setTimeout(runIteration, 150);
+            }
+        };
+
+        runIteration();
     }
 
     stopAi() {
-        clearInterval(this.#runningAi);
-        this.#runningAi = null;
+        this.#runningAi = false;
     }
 
 
@@ -65,9 +77,10 @@ export default class GameManager {
         const newTile = this.#gameBoard.addRandomTile()
         if (!this.#canMoveUp() && !this.#canMoveDown() && !this.#canMoveLeft() && !this.#canMoveRight()) {
             newTile.waitForTransition(true).then(_ => {
+                this.stopAi()
+                document.getElementById('startAIButton').innerHTML = 'Run AI'
                 alert("Game over")
                 this.restartGame()
-                this.resetListener()
             })
             return
         }
