@@ -1,5 +1,6 @@
 import GameBoard from "./GameBoard.js"
 import GameManager from "./GameManager.js"
+import { v4 as uuidv4 } from 'https://jspm.dev/uuid';
 
 main()
 
@@ -9,12 +10,10 @@ async function main() {
     const gameBoard = new GameBoard(gameBoardElem);
 
     const startAiButton = document.getElementById('startAIButton');
-    startAiButton.onclick = handleAiButton;
 
     window.onbeforeunload = () => save_user_data(gameBoard);
 
     let data = await get_user_data()
-    console.log(data);
     let gameManager
     if (data) {
         gameManager = new GameManager(gameBoardElem, gameBoard, data['tiles'], data['score'], data['best_score'])
@@ -22,14 +21,19 @@ async function main() {
     else {
         gameManager = new GameManager(gameBoardElem, gameBoard, [], 0, 0)
     }
+
+    startAiButton.onclick = (ev) => handleAiButton(ev, gameManager);
     gameManager.resetListener()
+    // gameManager.startAi();
 }
 
-function handleAiButton(ev) {
+function handleAiButton(ev, gameManager) {
     if (ev.target.innerHTML === 'Run AI') {
         ev.target.innerHTML = 'Stop AI'
+        gameManager.startAi();
     } else {
         ev.target.innerHTML = 'Run AI'
+        gameManager.stopAi();
     }
 }
 
@@ -37,7 +41,7 @@ function handleAiButton(ev) {
 async function get_user_data() {
     let user_id = localStorage.getItem('id')
     if (user_id == null) {
-        user_id = crypto.randomUUID()
+        user_id = uuidv4()
         localStorage.setItem('id', user_id)
         return null
     }
@@ -54,7 +58,7 @@ async function get_user_data() {
         const data = await response.json();
         return data;
     } catch (error) {
-        throw new Error('Error fetching user data: ' + error);
+        console.error('Error fetching user data:', error);
     }
 }
 

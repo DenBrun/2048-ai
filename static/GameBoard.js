@@ -108,10 +108,23 @@ export default class GameBoard {
     set score(value) {
         this.#score = value
         document.getElementById('score').innerHTML = value
+        if (value >= 20000) {
+            document.querySelector('.title').style.fontSize = '70px';
+        } else if (value == 0) {
+            document.querySelector('.title').style.fontSize = '80px';
+        }
     }
 
     set best_score(value) {
         this.#bestscore = value
         document.getElementById('bestscore').innerHTML = value
+    }
+
+    getMatrix() {
+        const matrix = [];
+        for (const cellRow of this.cellsByRow) {
+            matrix.push(cellRow.map(cell => cell.tile ? cell.tile.value : 0))
+        }
+        return matrix
     }
 }

@@ -1,9 +1,12 @@
+import MCTS from "./MCTS/MCTS.js";
+import GameState from "./MCTS/GameState.js";
+
 export default class GameManager {
     #gameBoardElem
     #gameBoard
+    #runningAi
 
     constructor(gameBoardElem, gameBoard, currTiles, score, bestScore) {
-        console.log(score, bestScore);
         this.#gameBoardElem = gameBoardElem
         this.#gameBoard = gameBoard
         if (currTiles.length) {
@@ -22,8 +25,74 @@ export default class GameManager {
         this.#gameBoardElem.addEventListener('swiped', (e) => this.#handleMove(e.detail.dir), { once: true });
     }
 
-    async #handleMove(direction) {
+    startAi() {
+        if (this.#runningAi) return;
+        this.#runningAi = true;
 
+        const explorationConstant = 2000;
+        const iterations = 2000;
+        const mcts = new MCTS(explorationConstant, iterations);
+
+
+        const runIteration = async () => {
+            if (!this.#canMoveUp() && !this.#canMoveDown() && !this.#canMoveLeft() && !this.#canMoveRight()) {
+                this.stopAi();
+                return;
+            }
+            const initialGameState = new GameState(this.#gameBoard.getMatrix(), this.#gameBoard.score);
+            const bestMove = mcts.search(initialGameState);
+            console.log("Best move:", bestMove);
+            await this.#handleAiMove(bestMove);
+
+            if (this.#runningAi) {
+                setTimeout(runIteration, 150);
+            }
+        };
+
+        runIteration();
+    }
+
+    stopAi() {
+        this.#runningAi = false;
+    }
+
+
+    async #handleAiMove(direction) {
+
+        switch (direction) {
+            case "up":
+                await this.#moveUp()
+                break
+            case "down":
+                await this.#moveDown()
+                break
+            case "left":
+                await this.#moveLeft()
+                break
+            case "right":
+                await this.#moveRight()
+                break
+            default:
+                return
+        }
+        this.#gameBoard.mergeTiles()
+        const newTile = this.#gameBoard.addRandomTile()
+        if (!this.#canMoveUp() && !this.#canMoveDown() && !this.#canMoveLeft() && !this.#canMoveRight()) {
+            newTile.waitForTransition(true).then(_ => {
+                this.stopAi()
+                document.getElementById('startAIButton').innerHTML = 'Run AI'
+                alert("Game over")
+                this.restartGame()
+            })
+            return
+        }
+    }
+
+    async #handleMove(direction) {
+        if (this.#runningAi) {
+            this.resetListener();
+            return;
+        }
         switch (direction) {
             case "up":
                 if (!this.#canMoveUp()) {
