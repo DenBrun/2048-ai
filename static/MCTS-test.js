@@ -1,154 +1,125 @@
-class MCTSNode {
-    constructor(moves, parent) {
-        this.parent = parent
-        this.visits = 0
-        this.wins = 0
-        this.numUnexpandedMoves = moves.length
-        this.children = new Array(this.numUnexpandedMoves).fill(null) //temporary store move for debugging purposes
+class Node {
+    constructor(state, parent = null, move = null) {
+        this.state = state;
+        this.parent = parent;
+        this.children = [];
+        this.visits = 0;
+        this.score = 0;
+        this.move = move
+    }
+
+    expand() {
+        const possibleMoves = this.state.getPossibleMoves();
+        for (const move of possibleMoves) {
+            const newBoard = this.state.clone();
+            newBoard.move(move);
+            const childNode = new Node(newBoard, this, move);
+            this.children.push(childNode);
+        }
+    }
+
+    select(explorationConstant) {
+        let bestChild = null;
+        let bestScore = Number.NEGATIVE_INFINITY;
+        for (const child of this.children) {
+            const score =
+                child.score / child.visits +
+                explorationConstant * Math.sqrt((Math.log10(this.visits)) / child.visits);
+            if (score > bestScore) {
+                bestScore = score;
+                bestChild = child;
+            }
+        }
+        return bestChild;
+    }
+
+    simulate() {
+        let tempState = this.state.clone();
+        while (!tempState.isGameOver()) {
+            const possibleMoves = tempState.getPossibleMoves();
+            const randomMove = possibleMoves[Math.floor(Math.random() * possibleMoves.length)];
+            tempState.move(randomMove);
+        }
+        return tempState.getScore();
+    }
+
+    update(score) {
+        this.visits++;
+        this.score += score;
+
+        if (this.parent !== null) {
+            this.parent.update(score);
+        }
+    }
+
+
+    isFullyExpanded() {
+        return this.children.length === this.state.getPossibleMoves().length;
     }
 }
-
 
 class MCTS {
-    constructor(game, player, iterations, exploration) {
-        this.game = game
-        this.player = player
-        this.iterations = iterations
-        this.exploration = exploration
-
-        if (this.iterations == undefined) {
-            this.iterations = 500
-        }
-        if (this.exploration == undefined) {
-            this.exploration = 1.41
-        }
+    constructor(explorationConstant, iterations) {
+        this.explorationConstant = explorationConstant;
+        this.iterations = iterations;
     }
 
-    selectMove() {
-        const originalState = this.game.getState()
-        const possibleMoves = this.game.moves()
-        const root = new MCTSNode(possibleMoves, null)
-
+    search(initialState) {
+        const root = new Node(initialState);
         for (let i = 0; i < this.iterations; i++) {
-            this.game.setState(originalState)
-            const clonedState = this.game.cloneState()
-            this.game.setState(clonedState)
-
-            let selectedNode = this.selectNode(root)
-            //if selected node is terminal and we lost, make sure we never choose that move
-            if (this.game.gameOver()) {
-                if (this.game.winner() != this.player && this.game.winner() != -1) {
-                    selectedNode.parent.wins = Number.MIN_SAFE_INTEGER
-                }
-            }
-            let expandedNode = this.expandNode(selectedNode)
-            this.playout(expandedNode)
-
-            let reward;
-            if (this.game.winner() == -1) { reward = 0 }
-            else if (this.game.winner() == this.player) { reward = 1 }
-            else { reward = -1 }
-            this.backprop(expandedNode, reward)
+            const node = this.treePolicy(root, i);
+            const score = node.simulate();
+            node.update(score);
         }
-
-        //choose move with most wins
-        let maxWins = -Infinity
-        let maxIndex = -1
-        for (let i in root.children) {
-            const child = root.children[i]
-            if (child == null) { continue }
-            if (child.wins > maxWins) {
-                maxWins = child.wins
-                maxIndex = i
-            }
-        }
-
-        this.game.setState(originalState)
-        return possibleMoves[maxIndex]
-    }
-    selectNode(root) {
-
-        const c = this.exploration
-
-        while (root.numUnexpandedMoves == 0) {
-            let maxUBC = -Infinity
-            let maxIndex = -1
-            let Ni = root.visits
-            for (let i in root.children) {
-                const child = root.children[i]
-                const ni = child.visits
-                const wi = child.wins
-                const ubc = this.computeUCB(wi, ni, c, Ni)
-                if (ubc > maxUBC) {
-                    maxUBC = ubc
-                    maxIndex = i
-                }
-            }
-            const moves = this.game.moves()
-            this.game.playMove(moves[maxIndex])
-
-            root = root.children[maxIndex]
-            if (this.game.gameOver()) {
-                return root
-            }
-        }
-        return root
+        const bestChild = this.bestChild(root);
+        // console.log(root);
+        // console.log(root.state.getPossibleMoves());
+        // CHECK THIS!!
+        return [bestChild.move, root];
     }
 
-    expandNode(node) {
-        if (this.game.gameOver()) {
-            return node
-        }
-        let moves = this.game.moves()
-        const childIndex = this.selectRandomUnexpandedChild(node)
-        this.game.playMove(moves[childIndex])
-
-        moves = this.game.moves()
-        const newNode = new MCTSNode(moves, node)
-        node.children[childIndex] = newNode
-        node.numUnexpandedMoves -= 1
-
-        return newNode
-    }
-
-    playout(node) {
-        while (!this.game.gameOver()) {
-            const moves = this.game.moves()
-            const randomChoice = Math.floor(Math.random() * moves.length)
-            this.game.playMove(moves[randomChoice])
-        }
-        return this.game.winner()
-    }
-    backprop(node, reward) {
-        while (node != null) {
-            node.visits += 1
-            node.wins += reward
-            node = node.parent
-        }
-    }
-
-    // returns index of a random unexpanded child of node
-    selectRandomUnexpandedChild(node) {
-        const choice = Math.floor(Math.random() * node.numUnexpandedMoves) //expand random nth unexpanded node
-        let count = -1
-        for (let i in node.children) {
-            const child = node.children[i]
-            if (child == null) {
-                count += 1
-            }
-            if (count == choice) {
-                return i
+    treePolicy(node, i) {
+        while (!node.state.isGameOver()) {
+            if (!node.isFullyExpanded()) {
+                const child = this.expand(node, i);
+                return child;
+            } else {
+                node = node.select(this.explorationConstant);
             }
         }
+        return node;
+
     }
 
-    computeUCB(wi, ni, c, Ni) {
-        return (wi / ni) + c * Math.sqrt(Math.log(Ni) / ni)
+    expand(node, i) {
+        const unexpandedMoves = node.state.getPossibleMoves().filter((move) => !node.state.moveIsExplored(move));
+
+        // console.log(unexpandedMoves);
+        const randomMove = unexpandedMoves[Math.floor(Math.random() * unexpandedMoves.length)];
+        node.state.setMoveExplored(randomMove);
+        const newBoard = node.state.clone();
+        if (!randomMove) {
+            console.log(i);
+        }
+        newBoard.move(randomMove);
+        const childNode = new Node(newBoard, node, randomMove);
+        node.children.push(childNode);
+        return childNode;
+    }
+
+    bestChild(node) {
+        let bestChild = null;
+        let bestScore = Number.NEGATIVE_INFINITY;
+        for (const child of node.children) {
+            const score = child.score / child.visits;
+            if (score > bestScore) {
+                bestScore = score;
+                bestChild = child;
+            }
+        }
+        return bestChild;
     }
 }
-
-
-
 
 class GameState {
     numRows = 4;
@@ -305,7 +276,7 @@ class GameState {
     }
 
     getScore() {
-        return this.score
+        return this.score;
     }
 
     moveIsExplored(move) {
@@ -315,30 +286,7 @@ class GameState {
     setMoveExplored(move, value = true) {
         this.exploredMoves.set(move, value)
     }
-
-    getBestMove() {
-        const possibleMoves = this.getPossibleMoves();
-
-        let bestMove = null;
-        let bestScore = -Infinity;
-
-        for (const move of possibleMoves) {
-            if (this.moveIsExplored(move)) {
-                const clonedState = this.clone();
-                clonedState.move(move);
-                const score = clonedState.getScore();
-
-                if (score > bestScore) {
-                    bestScore = score;
-                    bestMove = move;
-                }
-            }
-        }
-
-        return bestMove;
-    }
 }
-
 // const explorationConstant = 1.41;
 // const iterations = 100;
 
@@ -354,40 +302,35 @@ class GameState {
 // const bestMove = mcts.search(initialGameState);
 // console.log("Best move:", bestMove);
 
-
-const explorationConstant = 1.41;
+const explorationConstant = 1000;
 const iterations = 1000;
+const mcts = new MCTS(explorationConstant, iterations);
 
 let initialGameState = new GameState([
-    [2, 4, 0, 0],
-    [0, 0, 0, 0],
+    [2, 2, 4, 4],
+    [0, 0, 0, 8],
     [0, 0, 0, 0],
     [0, 0, 0, 0]],
-    1
+    2
 );
 
+// const [bestMove, root] = mcts.search(initialGameState);
+// console.log("Best move:", bestMove);
+// console.log(root.children.map(node => `${node.move} - ${node.visits}`));
 
-// while (!initialGameState.isGameOver()) {
-//     const mcts = new MCTS(explorationConstant, iterations);
-//     const bestMove = mcts.search(initialGameState);
-//     console.log("Best move:", bestMove);
 
-//     initialGameState.move(bestMove);
-//     // initialGameState.generateRandomTile();
-//     initialGameState = initialGameState.clone()
-// }
-// console.log(initialGameState.gameMatrix);
+let roots = [];
 while (!initialGameState.isGameOver()) {
-    let mcts = new MCTS(initialGameState);
-
-    let bestMove = mcts.selectAction(1000);
-    console.log("Best move:", bestMove);
+    const mcts = new MCTS(explorationConstant, iterations);
+    const [bestMove, root] = mcts.search(initialGameState);
+    roots.push(root.children.map(node => `${node.move} - ${node.visits}`))
+    // console.log("Best move:", bestMove);
 
     initialGameState.move(bestMove);
-    console.log(initialGameState.gameMatrix);
-    // initialGameState.generateRandomTile();
-    initialGameState = initialGameState.clone()
+    initialGameState.exploredMoves = new Map()
 }
 console.log(initialGameState.gameMatrix);
+console.log(initialGameState.score);
+console.log(roots.slice(0, 10));
 
 

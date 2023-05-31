@@ -1,10 +1,11 @@
 class Node {
-    constructor(state, parent = null) {
+    constructor(state, parent = null, move = null) {
         this.state = state;
         this.parent = parent;
         this.children = [];
         this.visits = 0;
         this.score = 0;
+        this.move = move
     }
 
     expand() {
@@ -12,7 +13,7 @@ class Node {
         for (const move of possibleMoves) {
             const newBoard = this.state.clone();
             newBoard.move(move);
-            const childNode = new Node(newBoard, this);
+            const childNode = new Node(newBoard, this, move);
             this.children.push(childNode);
         }
     }
@@ -71,9 +72,9 @@ export class MCTS {
             node.update(score);
         }
         const bestChild = this.bestChild(root);
-        console.log(bestChild);
-        // CHECK THIS!!
-        return bestChild.parent.state.getBestMove();
+        console.log(root);
+        console.log(root.state.getPossibleMoves());
+        return bestChild.move;
     }
 
     treePolicy(node) {
@@ -86,18 +87,18 @@ export class MCTS {
             }
         }
         return node;
+
     }
 
     expand(node) {
         const unexpandedMoves = node.state
             .getPossibleMoves()
             .filter((move) => !node.state.moveIsExplored(move));
-        // console.log(unexpandedMoves);
         const randomMove = unexpandedMoves[Math.floor(Math.random() * unexpandedMoves.length)];
         node.state.setMoveExplored(randomMove);
         const newBoard = node.state.clone();
         newBoard.move(randomMove);
-        const childNode = new Node(newBoard, node);
+        const childNode = new Node(newBoard, node, randomMove);
         node.children.push(childNode);
         return childNode;
     }
@@ -280,28 +281,6 @@ export class GameState {
 
     setMoveExplored(move, value = true) {
         this.exploredMoves.set(move, value)
-    }
-
-    getBestMove() {
-        const possibleMoves = this.getPossibleMoves();
-
-        let bestMove = null;
-        let bestScore = -Infinity;
-
-        for (const move of possibleMoves) {
-            if (this.moveIsExplored(move)) {
-                const clonedState = this.clone();
-                clonedState.move(move);
-                const score = clonedState.getScore();
-
-                if (score > bestScore) {
-                    bestScore = score;
-                    bestMove = move;
-                }
-            }
-        }
-
-        return bestMove;
     }
 }
 
