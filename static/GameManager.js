@@ -1,4 +1,6 @@
-import { MCTS, GameState } from "./MCTS.js";
+import MCTS from "./MCTS/MCTS.js";
+import GameState from "./MCTS/GameState.js";
+
 export default class GameManager {
     #gameBoardElem
     #gameBoard
