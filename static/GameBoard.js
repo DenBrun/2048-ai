@@ -108,6 +108,11 @@ export default class GameBoard {
     set score(value) {
         this.#score = value
         document.getElementById('score').innerHTML = value
+        if (value >= 20000) {
+            document.querySelector('.title').style.fontSize = '70px';
+        } else if (value == 0) {
+            document.querySelector('.title').style.fontSize = '80px';
+        }
     }
 
     set best_score(value) {
