@@ -54,13 +54,11 @@ export default class GameState {
                 throw new Error('Invalid move direction');
         }
 
-        this.moveTiles(rowStep, colStep);
+        this.#moveTiles(rowStep, colStep);
         this.generateRandomTile();
     }
 
-    moveTiles(rowStep, colStep) {
-        let hasMoved = false;
-
+    #moveTiles(rowStep, colStep) {
         const startRow = rowStep > 0 ? this.#numRows - 1 : 0;
         const startCol = colStep > 0 ? this.#numCols - 1 : 0;
         const rowIncrement = rowStep > 0 ? - 1 : 1;
@@ -77,7 +75,7 @@ export default class GameState {
                 let targetRow = row;
                 let targetCol = col;
 
-                while (this.isValidPosition(targetRow + rowStep, targetCol + colStep)) {
+                while (this.#isValidPosition(targetRow + rowStep, targetCol + colStep)) {
                     targetRow += rowStep;
                     targetCol += colStep;
                     const targetTileValue = this.#gameMatrix[targetRow][targetCol];
@@ -88,7 +86,6 @@ export default class GameState {
                         this.#gameMatrix[row][col] = 0;
                         row = targetRow;
                         col = targetCol;
-                        hasMoved = true;
                     }
                     else if (targetTileValue === tileValue && !merged.get([targetRow, targetCol].toString())) {
                         // Merge tiles
@@ -97,7 +94,6 @@ export default class GameState {
                         this.#gameMatrix[targetRow][targetCol] *= 2;
                         this.#score += this.#gameMatrix[targetRow][targetCol];
                         this.#gameMatrix[row][col] = 0;
-                        hasMoved = true;
                         break;
                     }
                     else {
@@ -108,37 +104,35 @@ export default class GameState {
 
             }
         }
-
-        return hasMoved;
     }
 
 
-    isValidPosition(row, col) {
+    #isValidPosition(row, col) {
         return row >= 0 && row < this.#numRows && col >= 0 && col < this.#numCols;
     }
 
     getPossibleMoves() {
         const possibleMoves = [];
-        if (this.canMove(-1, 0)) {
+        if (this.#canMove(-1, 0)) {
             possibleMoves.push('up');
         }
-        if (this.canMove(1, 0)) {
+        if (this.#canMove(1, 0)) {
             possibleMoves.push('down');
         }
-        if (this.canMove(0, -1)) {
+        if (this.#canMove(0, -1)) {
             possibleMoves.push('left');
         }
-        if (this.canMove(0, 1)) {
+        if (this.#canMove(0, 1)) {
             possibleMoves.push('right');
         }
         return possibleMoves;
     }
 
-    canMove(rowStep, colStep) {
+    #canMove(rowStep, colStep) {
         return this.#gameMatrix.some((row, rowIndex) =>
             row.some((tile, colIndex) => {
                 if (tile === 0) return false;
-                if (this.isValidPosition(rowIndex + rowStep, colIndex + colStep) &&
+                if (this.#isValidPosition(rowIndex + rowStep, colIndex + colStep) &&
                     (this.#gameMatrix[rowIndex + rowStep][colIndex + colStep] === 0 || this.#gameMatrix[rowIndex + rowStep][colIndex + colStep] === tile)) {
                     return true;
                 }
@@ -149,10 +143,10 @@ export default class GameState {
 
     isGameOver() {
         return (
-            !this.canMove(-1, 0) &&
-            !this.canMove(1, 0) &&
-            !this.canMove(0, -1) &&
-            !this.canMove(0, 1)
+            !this.#canMove(-1, 0) &&
+            !this.#canMove(1, 0) &&
+            !this.#canMove(0, -1) &&
+            !this.#canMove(0, 1)
         )
     }
 

@@ -24,7 +24,6 @@ async function main() {
 
     startAiButton.onclick = (ev) => handleAiButton(ev, gameManager);
     gameManager.resetListener()
-    // gameManager.startAi();
 }
 
 function handleAiButton(ev, gameManager) {

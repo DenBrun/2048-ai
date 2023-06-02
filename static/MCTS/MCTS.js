@@ -1,38 +1,40 @@
 import Node from "./Node.js";
 
 export default class MCTS {
+    #explorationConstant;
+    #iterations;
     constructor(explorationConstant, iterations) {
-        this.explorationConstant = explorationConstant;
-        this.iterations = iterations;
+        this.#explorationConstant = explorationConstant;
+        this.#iterations = iterations;
     }
 
     search(initialState) {
         const root = new Node(initialState);
-        for (let i = 0; i < this.iterations; i++) {
-            const node = this.treePolicy(root);
+        for (let i = 0; i < this.#iterations; i++) {
+            const node = this.#treePolicy(root);
             const score = node.simulate();
             node.update(score);
         }
-        const bestChild = this.bestChild(root);
+        const bestChild = this.#bestChild(root);
         console.log(root);
         console.log(root.state.getPossibleMoves());
         return bestChild.move;
     }
 
-    treePolicy(node) {
+    #treePolicy(node) {
         while (!node.state.isGameOver()) {
             if (!node.isFullyExpanded()) {
-                const child = this.expand(node);
+                const child = this.#expand(node);
                 return child;
             } else {
-                node = node.select(this.explorationConstant);
+                node = node.select(this.#explorationConstant);
             }
         }
         return node;
 
     }
 
-    expand(node) {
+    #expand(node) {
         const unexpandedMoves = node.state
             .getPossibleMoves()
             .filter((move) => !node.state.moveIsExplored(move));
@@ -45,7 +47,7 @@ export default class MCTS {
         return childNode;
     }
 
-    bestChild(node) {
+    #bestChild(node) {
         let bestChild = null;
         let bestScore = Number.NEGATIVE_INFINITY;
         for (const child of node.children) {
