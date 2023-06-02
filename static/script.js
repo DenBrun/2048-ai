@@ -12,14 +12,17 @@ async function main() {
     const startAiButton = document.getElementById('startAIButton');
     const resetButton = document.getElementById('resetGame');
 
+    // Setting listener to save data after after leaving a page or reloading
     window.onbeforeunload = () => save_user_data(gameBoard);
 
     let data = await get_user_data()
     let gameManager
     if (data) {
+        // Creating a game with previous state
         gameManager = new GameManager(gameBoardElem, gameBoard, data['tiles'], data['score'], data['best_score'])
     }
     else {
+        // Creating a new game
         gameManager = new GameManager(gameBoardElem, gameBoard, [], 0, 0)
     }
 
@@ -43,11 +46,12 @@ function handleAiButton(ev, gameManager) {
 async function get_user_data() {
     let user_id = localStorage.getItem('id')
     if (user_id == null) {
-        user_id = uuidv4()
-        localStorage.setItem('id', user_id)
+        user_id = uuidv4()                  // Generating a new UUIDv4 as the user ID
+        localStorage.setItem('id', user_id) // Storing the user ID in localStorage
         return null
     }
 
+    // Constructing the URL for retrieving user data
     const params = new URLSearchParams({
         id: user_id
     });
@@ -65,7 +69,9 @@ async function get_user_data() {
 }
 
 function save_user_data(gameBoard) {
+    // Retrieving the user ID from localStorage
     const user_id = localStorage.getItem('id')
+    // Formating for JSON
     const tiles = gameBoard.getTiles().map((tile) => ({ x: tile.x, y: tile.y, value: tile.value }))
     let data = { 'best_score': gameBoard.best_score, 'tiles': tiles, 'score': gameBoard.score }
     const user = {
@@ -73,6 +79,7 @@ function save_user_data(gameBoard) {
         data: data
     }
 
+    // Sending a POST request to save the user data
     fetch('/save-user', {
         method: 'POST',
         headers: {

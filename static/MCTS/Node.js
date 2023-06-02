@@ -35,6 +35,7 @@ export default class Node {
     }
 
     expand() {
+        // Expand this node by generating child nodes for all possible moves
         const possibleMoves = this.#state.getPossibleMoves();
         for (const move of possibleMoves) {
             const newBoard = this.#state.clone();
@@ -45,6 +46,7 @@ export default class Node {
     }
 
     select(explorationConstant) {
+        // Select the child node with the highest UCT score based on the exploration constant
         let bestChild = null;
         let bestScore = Number.NEGATIVE_INFINITY;
         for (const child of this.#children) {
@@ -60,6 +62,7 @@ export default class Node {
     }
 
     simulate() {
+        // Simulate a random game play from this node's state until a terminal state is reached
         let tempState = this.#state.clone();
         while (!tempState.isGameOver()) {
             const possibleMoves = tempState.getPossibleMoves();
@@ -70,6 +73,8 @@ export default class Node {
     }
 
     update(score) {
+        // Update the visits and score of this node and parent nodes
+        this.#visits++;
         this.#visits++;
         this.#score += score;
 

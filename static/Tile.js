@@ -6,6 +6,8 @@ export default class Tile {
 
     constructor(gameBoard, value = Math.random() > 0.5 ? 4 : 2) {
         this.#tileElement = document.createElement("div")
+
+        // Animation for tile showing
         this.#tileElement.classList.add("tile", `tile-${value}`, "tile-show")
         this.#tileElement.addEventListener('animationend', () => {
             this.#tileElement.classList.remove('tile-show'),
@@ -13,6 +15,7 @@ export default class Tile {
                 once: true,
             }
         })
+
         this.#tileElement.innerHTML = value
         gameBoard.append(this.#tileElement)
         this.#value = value
@@ -41,17 +44,19 @@ export default class Tile {
     }
 
     set value(value) {
+        // Updating the value of the tile
         this.#tileElement.classList.replace(`tile-${this.#value}`, `tile-${value}`)
         this.#value = value
         this.#tileElement.innerHTML = value
     }
 
     remove() {
-        this.#tileElement.remove()
+        this.#tileElement.remove() // Removing the tile element from the DOM
     }
 
 
     animateMerge() {
+        // Adding classes for css animations
         this.#tileElement.classList.add('tile-merge')
         this.#tileElement.addEventListener('animationend', () => {
             this.#tileElement.classList.remove('tile-merge'),

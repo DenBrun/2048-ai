@@ -41,6 +41,7 @@ export default class GameBoard {
     }
 
     getTiles() {
+        // Get the tiles currently present on the game board
         return this.#cells.reduce((arr, cell) => {
             if (cell.tile) {
                 arr.push(cell.tile)
@@ -52,6 +53,7 @@ export default class GameBoard {
     }
 
     deleteTiles() {
+        // Delete all tiles from the game board by removing a DOM element
         this.#cells.map((cell) => {
             if (cell.tile) {
                 cell.tile.remove()
@@ -61,6 +63,7 @@ export default class GameBoard {
     }
 
     get cellsByColumn() {
+        // Get the cells arranged by column
         const byColumn = [[], [], [], []]
         for (const cell of this.#cells) {
             byColumn[cell.x][cell.y] = cell
@@ -69,6 +72,7 @@ export default class GameBoard {
     }
 
     get cellsByRow() {
+        // Get the cells arranged by row
         const byRow = [[], [], [], []]
         for (const cell of this.#cells) {
             byRow[cell.y][cell.x] = cell
@@ -86,7 +90,7 @@ export default class GameBoard {
 
     #updateScore(difference) {
         let diffElem = document.createElement("div");
-        diffElem.classList.add("score-addition");
+        diffElem.classList.add("score-addition"); // used for score-adding animation
         diffElem.textContent = "+" + difference;
 
         document.getElementById('score').innerHTML = this.#score
@@ -121,6 +125,7 @@ export default class GameBoard {
     }
 
     getMatrix() {
+        // Get the matrix representation of the game board
         const matrix = [];
         for (const cellRow of this.cellsByRow) {
             matrix.push(cellRow.map(cell => cell.tile ? cell.tile.value : 0))

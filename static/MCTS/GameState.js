@@ -27,6 +27,7 @@ export default class GameState {
             }
         }
 
+        // adding a new tile to a random empty cell with a random value
         if (emptyCells.length > 0) {
             const randomCell = emptyCells[Math.floor(Math.random() * emptyCells.length)];
             this.#gameMatrix[randomCell.row][randomCell.col] = Math.random() < 0.5 ? 2 : 4;
@@ -108,6 +109,7 @@ export default class GameState {
 
 
     #isValidPosition(row, col) {
+        // check if row and col are in bounds
         return row >= 0 && row < this.#numRows && col >= 0 && col < this.#numCols;
     }
 
@@ -142,6 +144,7 @@ export default class GameState {
     }
 
     isGameOver() {
+        // when can't move in all directions
         return (
             !this.#canMove(-1, 0) &&
             !this.#canMove(1, 0) &&

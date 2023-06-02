@@ -3,7 +3,7 @@ export default class Cell {
     #x
     #y
     #tile
-    #tileToMerge
+    #tileToMerge // The tile object to be merged with the current tile
 
     constructor(cellElement, x, y) {
         this.#cellElement = cellElement
@@ -14,6 +14,7 @@ export default class Cell {
     set tile(tileElement) {
         this.#tile = tileElement
         if (tileElement == null) return
+        // Update position
         this.#tile.x = this.#x
         this.#tile.y = this.#y
     }
@@ -39,14 +40,15 @@ export default class Cell {
 
     mergeTiles() {
         if (this.#tile == null || !this.#tileToMerge) return 0
-        this.#tile.value *= 2
-        this.#tile.animateMerge()
+        this.#tile.value *= 2      // update value
+        this.#tile.animateMerge()  // start animation
         this.#tileToMerge.remove()
         this.#tileToMerge = null
         return this.#tile.value
     }
 
     canAccept(tile) {
+        // If no tile present or the tiles could be merged
         if (!this.#tile) return true
         return (this.#tileToMerge == null && this.#tile.value === tile.value)
     }

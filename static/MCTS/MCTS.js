@@ -9,22 +9,30 @@ export default class MCTS {
     }
 
     search(initialState) {
+        // Perform the MCTS search starting from the initial state
         const root = new Node(initialState);
+
+        // Run fixed amount of iterations
         for (let i = 0; i < this.#iterations; i++) {
             const node = this.#treePolicy(root);
             const score = node.simulate();
             node.update(score);
         }
+
+        // Choose the best child node to make a move
         const bestChild = this.#bestChild(root);
         return bestChild.move;
     }
 
     #treePolicy(node) {
+        // Select a child node according to the tree policy until a terminal state is reached
         while (!node.state.isGameOver()) {
             if (!node.isFullyExpanded()) {
+                // If the node is not fully expanded, expand a child node
                 const child = this.#expand(node);
                 return child;
             } else {
+                // Select the child node using UCB formula
                 node = node.select(this.#explorationConstant);
             }
         }
@@ -33,6 +41,7 @@ export default class MCTS {
     }
 
     #expand(node) {
+        // Expand a random unexplored move as a new child node
         const unexpandedMoves = node.state
             .getPossibleMoves()
             .filter((move) => !node.state.moveIsExplored(move));
@@ -46,6 +55,7 @@ export default class MCTS {
     }
 
     #bestChild(node) {
+        // Find the child node with the highest average score
         let bestChild = null;
         let bestScore = Number.NEGATIVE_INFINITY;
         for (const child of node.children) {

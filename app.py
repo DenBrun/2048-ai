@@ -6,6 +6,7 @@ app = Flask(__name__)
 
 
 def check_file():
+    # Crete data.txt if it doesn't exist
     if os.path.exists('data.txt'):
         try:
             with open('data.txt') as file:
@@ -13,9 +14,11 @@ def check_file():
                 json.loads(content)
 
         except ValueError:
+            # If the file content is not valid JSON, overwrite it with an empty JSON object
             with open('data.txt', 'w') as file:
                 file.write('{}')
     else:
+        # If the file doesn't exist, create it
         with open('data.txt', 'w') as file:
             file.write('{}')
 
@@ -25,6 +28,7 @@ check_file()
 
 @app.route('/')
 def get_main_page():
+    # Render the main page
     return render_template("index.html")
 
 
@@ -43,6 +47,7 @@ def get_user_data():
 
 @app.route('/save-user', methods=['POST'])
 def save_user_data():
+    # Save the updated game state
     new_data = request.get_json()
     try:
         with open('data.txt', 'r') as f:
