@@ -41,7 +41,6 @@ export default class GameManager {
             }
             const initialGameState = new GameState(this.#gameBoard.getMatrix(), this.#gameBoard.score);
             const bestMove = mcts.search(initialGameState);
-            console.log("Best move:", bestMove);
             await this.#handleAiMove(bestMove);
 
             if (this.#runningAi) {
@@ -140,6 +139,9 @@ export default class GameManager {
     }
 
     restartGame() {
+        if (this.#runningAi) {
+            return;
+        }
         this.#gameBoard.score = 0
         this.#gameBoard.deleteTiles()
         this.#gameBoard.addRandomTile()

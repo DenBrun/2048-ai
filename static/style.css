@@ -108,7 +108,6 @@ body {
 .heading {
     display: flex;
     justify-content: space-between;
-    /* margin-bottom: 40px; */
     padding: 10px;
 }
 
@@ -380,7 +379,7 @@ body {
     color: white;
     padding: 10px 10px;
     font-size: 20px;
-    margin: 0px 10px 40px auto;
+    margin: 0px 10px 0px 4px;
     /* height: 59px; */
     border-radius: 3px;
     cursor: pointer;
@@ -392,7 +391,36 @@ body {
 
 @media (max-width: 520px) {
     #startAIButton {
-        margin: 0px auto 30px auto;
+        margin: 0px 0 0 4px;
         font-size: 15px;
     }
+}
+
+.buttons-container {
+    display: flex;
+    margin-bottom: 40px;
+    align-items: center;
+    justify-content: center;
+}
+
+#resetGame {
+    display: block;
+    background: #bbada0;
+    color: white;
+    padding: 10px 10px;
+    font-size: 20px;
+    margin: 0px 0px 0px auto;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+@media (max-width: 520px) {
+    #resetGame {
+        font-size: 15px;
+        margin: 0px;
+    }
+}
+
+#resetGame:hover {
+    background-color: #635c54;
 }

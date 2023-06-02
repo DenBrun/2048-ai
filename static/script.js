@@ -10,6 +10,7 @@ async function main() {
     const gameBoard = new GameBoard(gameBoardElem);
 
     const startAiButton = document.getElementById('startAIButton');
+    const resetButton = document.getElementById('resetGame');
 
     window.onbeforeunload = () => save_user_data(gameBoard);
 
@@ -23,6 +24,8 @@ async function main() {
     }
 
     startAiButton.onclick = (ev) => handleAiButton(ev, gameManager);
+    resetButton.onclick = () => gameManager.restartGame();
+
     gameManager.resetListener()
 }
 

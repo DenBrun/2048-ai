@@ -52,7 +52,6 @@ export default class Tile {
 
 
     animateMerge() {
-        // this.#tileElement.classList.remove('tile-merge')
         this.#tileElement.classList.add('tile-merge')
         this.#tileElement.addEventListener('animationend', () => {
             this.#tileElement.classList.remove('tile-merge'),
@@ -61,7 +60,6 @@ export default class Tile {
             }
         })
 
-        // return this.waitForTransition(true)
     }
 
     waitForTransition(animation = false) {

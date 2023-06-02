@@ -16,8 +16,6 @@ export default class MCTS {
             node.update(score);
         }
         const bestChild = this.#bestChild(root);
-        console.log(root);
-        console.log(root.state.getPossibleMoves());
         return bestChild.move;
     }
 
